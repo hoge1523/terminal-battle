@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal Battle</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #0f0;
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #game-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    #log {
+      height: 50vh;
+      overflow-y: auto;
+      border-top: 2px solid #0f0;
+      padding: 10px;
+      background: #000;
+    }
+
+    .hp-bar {
+      width: 200px;
+      height: 20px;
+      background: #333;
+      border: 1px solid #0f0;
+      margin: 5px 0;
+      position: relative;
+    }
+
+    .hp-inner {
+      height: 100%;
+      background: #0f0;
+      transition: width 0.3s;
+    }
+
+    button {
+      background: #0f0;
+      color: #111;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #9f9;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Terminal Battle ⚔️</h1>
+    <div>プレイヤーHP</div>
+    <div class="hp-bar"><div id="player-hp" class="hp-inner"></div></div>
+    <div>CPU HP</div>
+    <div class="hp-bar"><div id="cpu-hp" class="hp-inner"></div></div>
+    <button id="attack-btn">攻撃！</button>
+  </div>
+
+  <div id="log"></div>
+
+  <script>
+    let playerHP = 100;
+    let cpuHP = 100;
+    const log = document.getElementById("log");
+    const playerBar = document.getElementById("player-hp");
+    const cpuBar = document.getElementById("cpu-hp");
+    const attackBtn = document.getElementById("attack-btn");
+
+    function updateBars() {
+      playerBar.style.width = playerHP + "%";
+      cpuBar.style.width = cpuHP + "%";
+    }
+
+    function logMsg(msg) {
+      const entry = document.createElement("div");
+      entry.textContent = msg;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    attackBtn.addEventListener("click", () => {
+      if (playerHP <= 0 || cpuHP <= 0) return;
+
+      const attackSuccess = Math.random() < 0.5;
+      const defendSuccess = Math.random() < 0.5;
+
+      if (attackSuccess && !defendSuccess) {
+        const dmg = Math.floor(Math.random() * 20) + 5;
+        cpuHP = Math.max(0, cpuHP - dmg);
+        logMsg(`プレイヤーの攻撃成功！CPUに${dmg}のダメージ！`);
+      } else if (!attackSuccess && defendSuccess) {
+        const counter = Math.floor(Math.random() * 15) + 5;
+        playerHP = Math.max(0, playerHP - counter);
+        logMsg(`CPUが反撃！プレイヤーに${counter}のダメージ！`);
+      } else {
+        logMsg("攻防が拮抗してお互いにダメージなし！");
+      }
+
+      updateBars();
+
+      if (cpuHP === 0) {
+        logMsg("🎉 プレイヤーの勝利！");
+        attackBtn.disabled = true;
+      } else if (playerHP === 0) {
+        logMsg("💀 CPUの勝利…");
+        attackBtn.disabled = true;
+      }
+    });
+
+    updateBars();
+    logMsg("バトル開始！");
+  </script>
+</body>
+</html>
